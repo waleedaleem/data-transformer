@@ -16,6 +16,21 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.walid.transform.Application'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 test {
     useJUnitPlatform()
 }

@@ -21,6 +21,11 @@ import jakarta.json.JsonWriter;
 import jakarta.json.JsonWriterFactory;
 import jakarta.json.stream.JsonGenerator;
 
+/**
+ * The Main class of the JSON data-transformer application
+ *
+ * @author wmoustaf
+ */
 public class Application {
 
     public static final String INPUT_FILE = "data.json";
