@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -27,6 +29,13 @@ import jakarta.json.stream.JsonGenerator;
  * @author wmoustaf
  */
 public class Application {
+
+    static {
+        String logConfig = Application.class.getClassLoader().getResource("logging.properties").getPath();
+        System.setProperty("java.util.logging.config.file", logConfig);
+    }
+
+    private static final Logger logger = Logger.getLogger(Application.class.getName());
 
     public static final String INPUT_FILE = "data.json";
     public static final String OUTPUT_FILE = "data-transformed.json";
@@ -48,6 +57,8 @@ public class Application {
         Map<String, Boolean> outputConfig = Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true);
         JsonWriterFactory writerFactory = Json.createWriterFactory(outputConfig);
 
+        logger.info(() -> String.format("Reading input from ./%s and writing output to ./%s", INPUT_FILE, OUTPUT_FILE));
+
         try (
             InputStream inputStream = new FileInputStream(inputFile);
             JsonReader reader = Json.createReader(inputStream);
@@ -55,9 +66,9 @@ public class Application {
             JsonWriter writer = writerFactory.createWriter(outputStream)) {
             writer.write(transform(reader.readArray()));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e, () -> "File handling error.");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e, () -> "Generic processing error.");
         }
     }
 
