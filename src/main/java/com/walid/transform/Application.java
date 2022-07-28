@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.json.Json;
@@ -16,6 +18,8 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonValue;
 import jakarta.json.JsonWriter;
+import jakarta.json.JsonWriterFactory;
+import jakarta.json.stream.JsonGenerator;
 
 public class Application {
 
@@ -36,11 +40,14 @@ public class Application {
         File inputFile = new File(currentDirectory, INPUT_FILE);
         File outputFile = new File(currentDirectory, OUTPUT_FILE);
 
+        Map<String, Boolean> outputConfig = Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true);
+        JsonWriterFactory writerFactory = Json.createWriterFactory(outputConfig);
+
         try (
             InputStream inputStream = new FileInputStream(inputFile);
             JsonReader reader = Json.createReader(inputStream);
             OutputStream outputStream = new FileOutputStream(outputFile);
-            JsonWriter writer = Json.createWriter(outputStream)) {
+            JsonWriter writer = writerFactory.createWriter(outputStream)) {
             writer.write(transform(reader.readArray()));
         } catch (IOException e) {
             e.printStackTrace();
