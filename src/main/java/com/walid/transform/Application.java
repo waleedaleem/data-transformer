@@ -49,6 +49,11 @@ public class Application {
     public static final String PRICE = "price";
     public static final String REVENUE = "revenue";
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments (nothing expected)
+     */
     public static void main(String[] args) {
         String currentDirectory = System.getProperty("user.dir");
         File inputFile = new File(currentDirectory, INPUT_FILE);
@@ -72,6 +77,12 @@ public class Application {
         }
     }
 
+    /**
+     * Splits input transaction array into customers and orders arrays
+     *
+     * @param input JSON transactions array
+     * @return a JSON object that consists of customers and orders arrays
+     */
     private static JsonObject transform(JsonArray input) {
         Set<JsonObject> customers = new HashSet<>();
         JsonArrayBuilder orders = Json.createArrayBuilder();
@@ -91,6 +102,12 @@ public class Application {
         return Json.createObjectBuilder(order.getJsonObject(CUSTOMER)).build();
     }
 
+    /**
+     * Transforms the JSON order object capturing the customer ID attribute
+     *
+     * @param order input order object
+     * @return transformed order object
+     */
     private static JsonObject extractOrder(JsonObject order) {
         return Json.createObjectBuilder(order)
             .add(CUSTOMER, order.getJsonObject(CUSTOMER).getString(ID))
@@ -106,6 +123,13 @@ public class Application {
         return outputItems.build();
     }
 
+    /**
+     * Transforms a JSON item enclosing the item ID as a property
+     *
+     * @param key item ID
+     * @param value input item object
+     * @return transformed item object
+     */
     private static JsonObject transformItem(String key, JsonValue value) {
         JsonObject item = value.asJsonObject();
         int quantity = item.getInt(QUANTITY);
