@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import jakarta.json.JsonReader;
@@ -26,12 +27,7 @@ import jakarta.json.stream.JsonGenerator;
  */
 public class Application {
 
-    static {
-        String logConfig = Application.class.getClassLoader().getResource("logging.properties").getPath();
-        System.setProperty("java.util.logging.config.file", logConfig);
-    }
-
-    private static final Logger logger = Logger.getLogger(Application.class.getName());
+    private static Logger logger;
 
     private static final String INPUT_FILE = "data.json";
     private static final String OUTPUT_FILE = "data-transformed.json";
@@ -49,6 +45,7 @@ public class Application {
         Map<String, Boolean> outputConfig = Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true);
         JsonWriterFactory writerFactory = createWriterFactory(outputConfig);
 
+        initialiseLogging();
         logger.info(() -> String.format("Reading input from ./%s and writing output to ./%s", INPUT_FILE, OUTPUT_FILE));
 
         try (
@@ -56,11 +53,23 @@ public class Application {
             JsonReader reader = createReader(inputStream);
             OutputStream outputStream = new FileOutputStream(outputFile);
             JsonWriter writer = writerFactory.createWriter(outputStream)) {
+
             writer.write(Transformer.transform(reader.readArray()));
+            logger.info(() -> "All done!");
         } catch (IOException e) {
             logger.log(Level.SEVERE, e, () -> "File handling error.");
         } catch (Exception e) {
             logger.log(Level.SEVERE, e, () -> "Generic processing error.");
         }
+    }
+
+    private static void initialiseLogging() {
+        try {
+            LogManager.getLogManager()
+                .readConfiguration(Application.class.getClassLoader().getResourceAsStream("logging.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger = Logger.getLogger(Application.class.getName());
     }
 }
