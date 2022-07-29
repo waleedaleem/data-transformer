@@ -7,7 +7,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 /**
  * A JSON transformer which transforms JSON transaction array into a JSON object that consists of customers and orders arrays
@@ -41,7 +40,7 @@ public class Transformer {
         JsonArrayBuilder orders = Json.createArrayBuilder();
         input.getValuesAs(JsonObject.class)
             .forEach(transaction -> {
-                customers.add(extractCustomer(transaction));
+                customers.add(transaction.getJsonObject(CUSTOMER));
                 orders.add(extractOrder(transaction));
             });
 
@@ -51,20 +50,16 @@ public class Transformer {
             .build();
     }
 
-    static JsonObject extractCustomer(JsonObject order) {
-        return Json.createObjectBuilder(order.getJsonObject(CUSTOMER)).build();
-    }
-
     /**
-     * Transforms the JSON order object capturing the customer ID attribute
+     * Transforms the JSON transaction object to an order object capturing the customer ID attribute
      *
-     * @param order input order object
+     * @param transaction input transaction object
      * @return transformed order object
      */
-    static JsonObject extractOrder(JsonObject order) {
-        return Json.createObjectBuilder(order)
-            .add(CUSTOMER, order.getJsonObject(CUSTOMER).getString(ID))
-            .add(ORDER, transformItems(order.getJsonObject(ORDER)))
+    static JsonObject extractOrder(JsonObject transaction) {
+        return Json.createObjectBuilder(transaction)
+            .add(CUSTOMER, transaction.getJsonObject(CUSTOMER).getString(ID))
+            .add(ORDER, transformItems(transaction.getJsonObject(ORDER)))
             .build();
     }
 
