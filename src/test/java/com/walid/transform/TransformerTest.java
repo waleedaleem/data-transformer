@@ -11,12 +11,14 @@ import static com.walid.transform.Transformer.QUANTITY;
 import static com.walid.transform.Transformer.REVENUE;
 import static com.walid.transform.Transformer.transform;
 
+import static jakarta.json.Json.createArrayBuilder;
+import static jakarta.json.Json.createObjectBuilder;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
@@ -39,28 +41,28 @@ class TransformerTest {
 
     @BeforeAll
     static void setUp() {
-        testItem1 = Json.createObjectBuilder()
+        testItem1 = createObjectBuilder()
             .add(QUANTITY, 14)
             .add(PRICE, 8)
             .build();
 
-        testItem2 = Json.createObjectBuilder()
+        testItem2 = createObjectBuilder()
             .add(QUANTITY, 9)
             .add(PRICE, 3)
             .build();
 
-        testItems = Json.createObjectBuilder()
+        testItems = createObjectBuilder()
             .add(TEST_ID1, testItem1)
             .add(TEST_ID2, testItem2)
             .build();
 
-        testCustomer1 = Json.createObjectBuilder()
+        testCustomer1 = createObjectBuilder()
             .add(ID, "8baa6dea-cc70-4748-9b27-b174e70e4b66")
             .add(NAME, "Lezlie Stuther")
             .add(ADDRESS, "19045 Lawn Court")
             .build();
 
-        testTransaction1 = Json.createObjectBuilder()
+        testTransaction1 = createObjectBuilder()
             .add(ID, 1)
             .add(VENDOR, "acme")
             .add(DATE, "03/03/2017")
@@ -68,14 +70,14 @@ class TransformerTest {
             .add(ORDER, testItems)
             .build();
 
-        expectedItems = Json.createArrayBuilder()
-            .add(Json.createObjectBuilder()
+        expectedItems = createArrayBuilder()
+            .add(createObjectBuilder()
                 .add(ITEM, TEST_ID1)
                 .add(QUANTITY, 14)
                 .add(PRICE, 8)
                 .add(REVENUE, 112)
                 .build())
-            .add(Json.createObjectBuilder()
+            .add(createObjectBuilder()
                 .add(ITEM, TEST_ID2)
                 .add(QUANTITY, 9)
                 .add(PRICE, 3)
@@ -83,7 +85,7 @@ class TransformerTest {
                 .build())
             .build();
 
-        expectedOrder = Json.createObjectBuilder()
+        expectedOrder = createObjectBuilder()
             .add(ID, 1)
             .add(VENDOR, "acme")
             .add(DATE, "03/03/2017")
@@ -94,12 +96,12 @@ class TransformerTest {
 
     @Test
     void testTransform() {
-        JsonObject expectedOutput = Json.createObjectBuilder()
-            .add(CUSTOMERS, Json.createArrayBuilder().add(testCustomer1).build())
-            .add(ORDERS, Json.createArrayBuilder().add(expectedOrder).build())
+        JsonObject expectedOutput = createObjectBuilder()
+            .add(CUSTOMERS, createArrayBuilder().add(testCustomer1).build())
+            .add(ORDERS, createArrayBuilder().add(expectedOrder).build())
             .build();
 
-        assertEquals(expectedOutput, transform(Json.createArrayBuilder()
+        assertEquals(expectedOutput, transform(createArrayBuilder()
             .add(testTransaction1).build()));
     }
 
@@ -115,7 +117,7 @@ class TransformerTest {
 
     @Test
     void testTransformItem() {
-        final JsonObject expected = Json.createObjectBuilder(testItem1)
+        final JsonObject expected = createObjectBuilder(testItem1)
             .add(ITEM, TEST_ID1)
             .add(REVENUE, 112)
             .build();

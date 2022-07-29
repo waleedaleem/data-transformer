@@ -1,9 +1,11 @@
 package com.walid.transform;
 
+import static jakarta.json.Json.createArrayBuilder;
+import static jakarta.json.Json.createObjectBuilder;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
@@ -37,15 +39,15 @@ public class Transformer {
      */
     public static JsonObject transform(JsonArray input) {
         Set<JsonObject> customers = new HashSet<>();
-        JsonArrayBuilder orders = Json.createArrayBuilder();
+        JsonArrayBuilder orders = createArrayBuilder();
         input.getValuesAs(JsonObject.class)
             .forEach(transaction -> {
                 customers.add(transaction.getJsonObject(CUSTOMER));
                 orders.add(extractOrder(transaction));
             });
 
-        return Json.createObjectBuilder()
-            .add(CUSTOMERS, Json.createArrayBuilder(customers))
+        return createObjectBuilder()
+            .add(CUSTOMERS, createArrayBuilder(customers))
             .add(ORDERS, orders)
             .build();
     }
@@ -57,14 +59,14 @@ public class Transformer {
      * @return transformed order object
      */
     static JsonObject extractOrder(JsonObject transaction) {
-        return Json.createObjectBuilder(transaction)
+        return createObjectBuilder(transaction)
             .add(CUSTOMER, transaction.getJsonObject(CUSTOMER).getString(ID))
             .add(ORDER, transformItems(transaction.getJsonObject(ORDER)))
             .build();
     }
 
     static JsonArray transformItems(JsonObject items) {
-        JsonArrayBuilder outputItems = Json.createArrayBuilder();
+        JsonArrayBuilder outputItems = createArrayBuilder();
         items.forEach(
             (key, value) -> outputItems.add(transformItem(key, value.asJsonObject()))
         );
@@ -81,7 +83,7 @@ public class Transformer {
     static JsonObject transformItem(String itemID, JsonObject item) {
         int quantity = item.getInt(QUANTITY);
         int price = item.getInt(PRICE);
-        return Json.createObjectBuilder()
+        return createObjectBuilder()
             .add(ITEM, itemID)
             .add(QUANTITY, quantity)
             .add(PRICE, price)

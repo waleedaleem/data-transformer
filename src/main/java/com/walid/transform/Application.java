@@ -1,5 +1,8 @@
 package com.walid.transform;
 
+import static jakarta.json.Json.createReader;
+import static jakarta.json.Json.createWriterFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,7 +14,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.json.Json;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonWriter;
 import jakarta.json.JsonWriterFactory;
@@ -45,13 +47,13 @@ public class Application {
     public static void main(String[] args) {
 
         Map<String, Boolean> outputConfig = Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true);
-        JsonWriterFactory writerFactory = Json.createWriterFactory(outputConfig);
+        JsonWriterFactory writerFactory = createWriterFactory(outputConfig);
 
         logger.info(() -> String.format("Reading input from ./%s and writing output to ./%s", INPUT_FILE, OUTPUT_FILE));
 
         try (
             InputStream inputStream = new FileInputStream(inputFile);
-            JsonReader reader = Json.createReader(inputStream);
+            JsonReader reader = createReader(inputStream);
             OutputStream outputStream = new FileOutputStream(outputFile);
             JsonWriter writer = writerFactory.createWriter(outputStream)) {
             writer.write(Transformer.transform(reader.readArray()));
